@@ -1,5 +1,12 @@
 # Deployment
 
+## Illustrated GitHub Pages site
+
+The no-build site lives in `docs/index.html`, alongside eight accessible SVG
+illustrations. After the files land in the repository, enable **Settings →
+Pages → Deploy from a branch → main → /docs → Save**. See [PAGES.md](PAGES.md).
+The Pages URL is available in GitHub settings once its first deployment finishes.
+
 ## GitHub and Python distribution
 
 The GitHub package is a standard src-layout Python project with tests, Apache-2.0

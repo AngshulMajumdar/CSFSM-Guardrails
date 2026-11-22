@@ -1,0 +1,113 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#102c36">
+  <meta name="description" content="CSFSM Guardrails: a conversational stochastic finite-state guardrail for model responses and protected tools. Explore eight illustrated explanations, the mathematics, and the open-source implementation.">
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="CSFSM Guardrails — a guardrail with memory">
+  <meta property="og:description" content="Eight visual explanations of a conversational stochastic finite-state guardrail, from posterior filtering to protected tool execution.">
+  <link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="site.css">
+  <script defer src="site.js"></script>
+  <title>CSFSM Guardrails | A guardrail with memory</title>
+</head>
+<body>
+  <a class="skip-link" href="#main">Skip to content</a>
+  <header class="site-header" id="top">
+    <div class="progress" aria-hidden="true"><span id="scroll-progress"></span></div>
+    <div class="header-inner wrap">
+      <a class="brand" href="#top" aria-label="CSFSM Guardrails, back to top"><span class="brand-mark" aria-hidden="true"><span></span><span></span><span></span></span><span>CSFSM<span class="brand-secondary"> / Guardrails</span></span></a>
+      <button id="nav-toggle" class="nav-toggle" type="button" aria-expanded="false" aria-controls="main-nav" aria-label="Open navigation"><span></span><span></span><span></span></button>
+      <nav class="main-nav" id="main-nav" aria-label="Main navigation">
+        <a href="#overview">Overview</a><a href="#inference">Inference</a><a href="#decisions">Decisions</a><a href="#tools">Tools</a><a href="#integrate">Integrate</a>
+      </nav>
+      <a class="header-link" href="https://github.com/AngshulMajumdar/CSFSM-Guardrails" target="_blank" rel="noopener noreferrer">View source <span aria-hidden="true">↗</span></a>
+    </div>
+  </header>
+
+  <main id="main">
+    <section class="hero" aria-labelledby="hero-title">
+      <div class="hero-grid wrap">
+        <div class="hero-copy">
+          <span class="eyebrow light"><span class="status-dot"></span> OPEN SOURCE · PYTHON · CPU READY</span>
+          <h1 id="hero-title">A guardrail<br><em>with memory.</em></h1>
+          <p class="hero-lead">CSFSM follows the conversation, maintains uncertainty about what is happening, and checks a proposed action <strong>before</strong> an application releases text or executes a tool.</p>
+          <div class="hero-actions"><a class="button button-bright" href="#overview">Explore the system <span aria-hidden="true">↓</span></a><a class="button button-outline" href="https://huggingface.co/spaces/Angshul/CSFSM-Guardrails" target="_blank" rel="noopener noreferrer">Open live demo <span aria-hidden="true">↗</span></a></div>
+          <p class="hero-note">An inspectable enforcement framework. The included language rules and risk values are illustrative, not a trained or calibrated safety model.</p>
+        </div>
+        <div class="hero-visual" aria-label="A conversation entering a guarded state machine">
+          <div class="hero-visual-title"><span>LIVE CONTROL LOOP</span><span>01 — 08</span></div>
+          <div class="hero-orbit" aria-hidden="true"><div class="orbit orbit-a"></div><div class="orbit orbit-b"></div><div class="orbit orbit-c"></div><div class="core"><span class="core-small">CURRENT BELIEF</span><span class="core-large">b<sub>t</sub></span><span class="core-small">+ trusted state s<sub>t</sub></span></div><span class="orb orb-a"></span><span class="orb orb-b"></span><span class="orb orb-c"></span></div>
+          <div class="hero-route"><span>MESSAGE</span><span aria-hidden="true">→</span><span>FILTER</span><span aria-hidden="true">→</span><span>GATE</span><span aria-hidden="true">→</span><span>RELEASE / FALLBACK</span></div>
+        </div>
+      </div>
+      <div class="hero-bottom wrap"><span>08 illustrated ideas</span><span>One controlled path from candidate to action</span><a href="#overview">Begin reading <span aria-hidden="true">↘</span></a></div>
+    </section>
+
+    <section class="intro wrap" id="overview">
+      <div class="section-label"><span>01 / THE IDEA</span><span class="section-rule"></span><span>THE SYSTEM</span></div>
+      <div class="intro-grid"><div><h2>One decision is<br>never the whole conversation.</h2></div><div><p>A single text classifier sees a message in isolation. CSFSM keeps a posterior over latent conversational modes and a separate protocol state controlled by trusted application events. Every proposed response and protected tool call must pass the current gate.</p><div class="metric-row"><span><b>4</b> latent modes in the default policy</span><span><b>7</b> configurable actions</span><span><b>3</b> guarded stages</span></div></div></div>
+      <figure class="illustration wide"><img src="assets/illustrations/01-conversation-loop.svg" width="1152" height="664" alt="A message enters a posterior filter and an action gate; an allowed draft is released, while a blocked one receives fixed fallback text." loading="eager"><figcaption><span class="fig-no">FIG. 01</span><strong>The loop checks the actual draft before release.</strong> The wrapper checks input before generation; a separate output check examines the generated draft. A blocked check yields the configured fallback.</figcaption></figure>
+    </section>
+
+    <section class="section-band" id="inference">
+      <div class="wrap">
+        <div class="section-label"><span>02 / INFERENCE</span><span class="section-rule"></span><span>THE POSTERIOR</span></div>
+        <div class="section-heading"><div><span class="kicker">OBSERVE → UPDATE</span><h2>Uncertainty is<br>part of the state.</h2></div><p>Let <code>b</code> be a distribution over routine, uncertain, restricted and probing modes. An evidence symbol changes those probabilities using an action-conditioned transition and a likelihood. It does not change who is authorized.</p></div>
+        <figure class="illustration"><img src="assets/illustrations/02-posterior.svg" width="1152" height="664" alt="Four mode probabilities before and after a probing observation. The probing probability rises from 0.5 percent to 63.0 percent under the bundled example matrices. The diagram shows the normalized Bayesian filtering equation." loading="lazy"><figcaption><span class="fig-no">FIG. 02</span><strong>Belief responds to evidence.</strong> The bars are one computation using the bundled default matrices, starting from the configured prior. They illustrate the filter; they do not measure semantic detector accuracy.</figcaption></figure>
+
+        <div class="explorer" id="explorer" aria-labelledby="explorer-title">
+          <div class="explorer-intro"><div><span class="kicker">TRY THE NUMBERS</span><h3 id="explorer-title">Change the observation.</h3><p>This local example applies one filtering step to the published prior and matrices. It is a numerical illustration, not an authorization decision.</p></div><div class="explorer-control"><label for="observation">Observed symbol</label><select id="observation" name="observation"><option value="probing">probing</option><option value="routine">routine</option><option value="ambiguous">ambiguous</option><option value="restricted">restricted</option><option value="unknown">unknown</option></select></div></div>
+          <div class="explorer-bars" id="posterior-bars" aria-live="polite"><div class="explorer-placeholder">Calculating posterior…</div></div>
+          <div class="equation-row"><code>b_next = normalize((b × T[action]) × likelihood(observation))</code><span>Initial action: noop · displayed values rounded to 0.1%</span></div>
+        </div>
+
+        <div class="twin-intro"><div><span class="kicker">TWO COORDINATES</span><h3>Language cannot verify a user.</h3></div><p>A person can type “I am verified” into a prompt. This may be observed as language evidence, but only a trusted host event changes the protocol state from unverified to verified. Revocation clears grants; closed remains closed.</p></div>
+        <figure class="illustration"><img src="assets/illustrations/03-trust-boundary.svg" width="1152" height="664" alt="Separate lanes for untrusted user language and trusted host events. A message claiming verification leaves protocol state unverified, whereas a host verified event changes it. Revocation removes grants and the closed state is absorbing." loading="lazy"><figcaption><span class="fig-no">FIG. 03</span><strong>Trusted state is a different coordinate.</strong> Treat model text and tool output as evidence or candidate content. Verification, revocation and exact tool grants must come from application code.</figcaption></figure>
+      </div>
+    </section>
+
+    <section class="wrap section-pad" id="decisions">
+      <div class="section-label"><span>03 / DECISION</span><span class="section-rule"></span><span>THE GATE</span></div>
+      <div class="section-heading"><div><span class="kicker">RISK + CONSTRAINTS</span><h2>Restrict the set.<br>Then choose.</h2></div><p>The controller computes a conservative numerical risk bound for each action, applies protocol and content constraints, and assigns an exact zero to actions outside the admissible set. A stop action remains available.</p></div>
+      <figure class="illustration"><img src="assets/illustrations/04-robust-risk.svg" width="1152" height="664" alt="A robust risk upper bound adds a total-variation uncertainty margin to a posterior weighted score, capped at maximum state risk. A 0.15 bound passes a 0.20 limit; 0.62 fails." loading="lazy"><figcaption><span class="fig-no">FIG. 04</span><strong>Uncertainty widens the risk score.</strong> Here <code>eta</code> is a total-variation radius. The formula gives a conservative bound on the modeled score; it is not necessarily the exact robust optimum.</figcaption></figure>
+      <figure class="illustration"><img src="assets/illustrations/05-action-mask.svg" width="1152" height="664" alt="A table shows release, clarify and stop eligible at an output stage; execute_tool is masked because it belongs to the tool stage. Forbidden actions get probability zero." loading="lazy"><figcaption><span class="fig-no">FIG. 05</span><strong>The gate enforces stage and hard rules.</strong> The illustration shows stage masking. The actual set also depends on protocol successors, validators, risk allowance, tool permissions and session limits.</figcaption></figure>
+      <div class="split-callout"><span class="callout-mark" aria-hidden="true">∩</span><div><strong>An allowed distribution is a projection.</strong><p>Compute the reference action probabilities from expected utilities, set forbidden actions to zero, and renormalize the remaining mass. This solves the forward KL projection onto the allowed support.</p></div></div>
+      <figure class="illustration"><img src="assets/illustrations/06-kl-projection.svg" width="1152" height="664" alt="Reference probabilities for clarify, release, refuse and stop are 0.15, 0.55, 0.20 and 0.10. Masking release yields projected probabilities 0.333, zero, 0.444 and 0.222 after renormalizing." loading="lazy"><figcaption><span class="fig-no">FIG. 06</span><strong>Forbidden stays exactly zero.</strong> The numbers are an illustration of masked normalization. The default runtime chooses the maximum projected probability; a policy may instead sample.</figcaption></figure>
+    </section>
+
+    <section class="section-band tools-band" id="tools"><div class="wrap">
+      <div class="section-label"><span>04 / ACTUATION</span><span class="section-rule"></span><span>PROTECTED TOOLS</span></div>
+      <div class="section-heading"><div><span class="kicker">CHECK → RESERVE → RUN</span><h2>Guard the action,<br>not just its description.</h2></div><p>For a real tool, a decision response alone cannot prevent a side effect. CSFSM exposes a wrapper that registers the callable, validates its arguments, checks host verification and a single-use grant, reserves an execution ID, and checks the result before release.</p></div>
+      <figure class="illustration"><img src="assets/illustrations/07-tool-transaction.svg" width="1152" height="664" alt="Five stages: trusted host verifies, grants exact arguments, runtime reserves an execution ID, invokes a registered tool and checks its output. Completed retries return a cached result, while a crash leaves a pending operation for reconciliation." loading="lazy"><figcaption><span class="fig-no">FIG. 07</span><strong>Tool execution is an enforced path.</strong> An interrupted reservation is not silently retried. The host must reconcile external side effects, preferably using the external system's own idempotency key.</figcaption></figure>
+      <div class="tool-note"><div class="tool-note-icon" aria-hidden="true">!</div><p><strong>Important boundary:</strong> a blocked tool result prevents disclosure, but cannot undo a side effect already performed by the tool. Keep tool functions narrow and authorize their exact arguments.</p></div>
+    </div></section>
+
+    <section class="wrap section-pad" id="guarantee">
+      <div class="section-label"><span>05 / MATHEMATICAL SCOPE</span><span class="section-rule"></span><span>WHAT THE BOUND MEANS</span></div>
+      <div class="section-heading"><div><span class="kicker">CONDITIONAL MODE ONLY</span><h2>A session budget<br>has assumptions.</h2></div><p>If a deployment supplies valid conditional bounds on actual violations, the policy can divide a total probability budget across a bounded number of decisions. The union bound then controls the probability of at least one violation under those assumptions. The bundled default uses <code>model_score</code> instead.</p></div>
+      <figure class="illustration"><img src="assets/illustrations/08-session-budget.svg" width="1152" height="664" alt="An optional conditional bound distributes alpha 0.05 across at most ten decisions with allowance 0.005 per decision. Under justified conditional risk assumptions, the probability of any violation is at most 0.05; the default model-score mode makes no such guarantee." loading="lazy"><figcaption><span class="fig-no">FIG. 08</span><strong>A budget is meaningful only with valid conditional risk bounds.</strong> The software checks numeric accounting; it cannot prove that an external semantic detector meets its claimed envelope.</figcaption></figure>
+    </section>
+
+    <section class="integrate" id="integrate"><div class="wrap">
+      <div class="section-label dark"><span>06 / BUILD WITH IT</span><span class="section-rule"></span><span>PYTHON + HTTP</span></div>
+      <div class="integrate-grid"><div><h2>Place the gate at<br>your output boundary.</h2><p>Use the enforcing SDK around generation, or connect a backend to the authenticated REST API. For tools, register real functions on the trusted host and route execution through <code>execute_tool</code>.</p><div class="integrate-buttons"><a class="button button-bright" href="https://github.com/AngshulMajumdar/CSFSM-Guardrails" target="_blank" rel="noopener noreferrer">Read source and API <span aria-hidden="true">↗</span></a><a class="button button-outline" href="https://huggingface.co/spaces/Angshul/CSFSM-Guardrails" target="_blank" rel="noopener noreferrer">Try the Space <span aria-hidden="true">↗</span></a></div></div><div class="code-window"><div class="code-top"><span class="code-dots" aria-hidden="true"><i></i><i></i><i></i></span><span>guarded_generation.py</span><span>PYTHON</span></div><pre><code><span class="syn-purple">from</span> csfsm_guardrails <span class="syn-purple">import</span> Guardrail
+
+conversation = Guardrail().session()
+
+result = conversation.run(
+    user_text,
+    your_model,  <span class="syn-comment"># called only if input passes</span>
+)
+
+send_to_user(result.content)
+<span class="syn-comment"># checked draft or fixed fallback</span></code></pre></div></div>
+      <div class="feature-strip"><div><span>01</span><strong>Python SDK</strong><small>Sync, async and buffered streams</small></div><div><span>02</span><strong>Authenticated API</strong><small>Tenant scope, revisions, idempotency</small></div><div><span>03</span><strong>Framework adapters</strong><small>LangChain and LangGraph examples</small></div><div><span>04</span><strong>CPU demo</strong><small>Standalone Gradio Space</small></div></div>
+    </div></section>
+    <section class="closing wrap"><span class="kicker">THE PRACTICAL LIMIT</span><p>Guardrails only control paths an application actually routes through them. The shipped detector is a small rule baseline with hand-configured parameters. Domain deployment calls for suitable detectors, evaluation on whole conversations and trusted host authentication.</p><a href="https://github.com/AngshulMajumdar/CSFSM-Guardrails/blob/main/SECURITY.md" target="_blank" rel="noopener noreferrer">Read the security boundary <span aria-hidden="true">↗</span></a></section>
+  </main>
+  <footer class="site-footer"><div class="wrap footer-inner"><span class="footer-brand">CSFSM <span>/ Guardrails</span></span><span>Angshul Majumdar · IIIT-Delhi · Apache-2.0</span><a href="#top">Back to top ↑</a></div></footer>
+</body>
+</html>
